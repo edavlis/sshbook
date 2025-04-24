@@ -30,9 +30,11 @@ Build & Install
 
 This installs sshbook to /usr/local/bin/.
 
-Usage
 ![usagegif](./usagegif.gif)
 
+
+
+Usage
 Run:
 
     sshbook

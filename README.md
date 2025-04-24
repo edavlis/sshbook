@@ -1,9 +1,9 @@
-##**sshbook**
+# **sshbook**
 
 Minimal terminal-based SSH launcher with a persistent menu.
 
 sshbook is a simple TUI tool for managing and launching SSH connections. It stores entries in a plain-text config file and lets you add, delete, and connect to hosts from a scrollable list — all in your terminal.
-✨ Features
+ Features
 
     Add, remove, and persist SSH entries
 
@@ -15,26 +15,33 @@ sshbook is a simple TUI tool for managing and launching SSH connections. It stor
 
     Minimal dependencies, fast and lightweight
 
-📦 Installation
+ Installation
+
 Requirements
 
     C compiler (gcc, clang, etc.)
 
-    POSIX-compatible system (Linux, macOS, etc.)
+    Unix system (Linux, macOS, etc.)
 
 Build & Install
 
-make
-sudo make install
+    make
+    sudo make install
 
 This installs sshbook to /usr/local/bin/.
-🚀 Usage
 
-Just run:
+Usage
+![usagegif](./usagegif.gif)
 
-sshbook
+Run:
+
+    sshbook
 
 Controls
 
-↑ / ↓
-
+    ↑: Go upwards
+    ↓: Go downwards
+    [Enter] Select entry
+    a: Add entry
+    d: delete entry
+    [Ctrl-c]: exit

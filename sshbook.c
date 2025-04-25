@@ -37,7 +37,7 @@ void clearScreen() {
 void draw_menu(Menu *menu, int selected) {
 	clearScreen();
 	
-	printf("\n[A]dd entry\t [D]elete entry\t [Enter] Connect [Ctrl-C] Exit\n");
+	printf("\n[a]dd entry\t [d]elete entry\t\t [Enter] Connect\t [q]uit\n\n");
 	for(int i = 0; i < menu->count; i++) {
 		if (i == selected) {
 			printf("\033[1m-> %s\n\033[0m", menu->items[i]);
@@ -116,7 +116,7 @@ void saveMenu(Menu *menu, const char *path) {
 void addItem(Menu *menu, const char *path) {
 	disableRawMode();
 	char buffer[512];
-	printf("New entry:");
+	printf("New entry: ");
 	if (fgets(buffer, sizeof buffer, stdin)) {
 		buffer[strcspn(buffer, "\r\n")] = 0;
 		menuAdd(menu, strdup(buffer));
@@ -185,6 +185,10 @@ int main() {
 		else if (c == 'd') {
 				deleteItem(&menu, config, &selected);
 			}
+		else if (c == 'q') {
+			disableRawMode();
+			break;
+		}
 		else if (c == '\n' || c == '\r') {
 				disableRawMode();
 				char connected[512] = "ssh ";

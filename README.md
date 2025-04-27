@@ -7,7 +7,7 @@ sshbook is a simple TUI tool for managing and launching SSH connections. It stor
 
     Add, remove, and connect to SSH entries
 
-    Scrollable TUI menu with keyboard navigation
+    Scrollable TUI menu with keyboard navigation & vim mode
 
     Minimal dependencies
 
@@ -47,8 +47,8 @@ Run:
 
 Controls
 
-    ↑: Go upwards
-    ↓: Go downwards
+    ↑ / k: Go upwards
+    ↓ / j: Go downwards
     [Enter] Select entry
     a: Add entry
     d: delete entry

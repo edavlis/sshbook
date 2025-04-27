@@ -176,6 +176,12 @@ int main() {
 				}
 			}	
 		}
+		if (c == 'j') {
+			selected = (selected + 1 + menu.count) % menu.count;
+		}
+		else if (c == 'k') {
+			selected = (selected - 1) % menu.count;
+		}
 		else if (c == 'a') {
 				addItem(&menu, config);
 				if (menu.count == 1) {

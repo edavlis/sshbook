@@ -52,4 +52,10 @@ Controls
     [Enter] Select entry
     a: Add entry
     d: delete entry
-    [q]: exit
+    q: exit
+    h: help
+
+Add a description to your addresses by adding a '/' and then a description. Example:
+    126.42.98.92 / My server
+    126.42.98.92 / My router
+

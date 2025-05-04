@@ -62,7 +62,7 @@ void menuAdd(Menu *menu, char *line) {
 	menu->items[menu->count++] = line;
 	}
 
-// expand home path, config file, etc.
+// expand home path, addresses file, etc.
 char *getHomePath() {
 	const char *home = getenv("HOME");
 	if (!home) {
@@ -84,6 +84,29 @@ char *getHomePath() {
 	}
 	return path;
 }
+
+char* getDescPath() {
+	const char *home = getenv("HOME");
+	if (!home) {
+		struct passwd *pw = getpwuid(getuid());
+		home = pw->pw_dir;
+	}
+
+	char *path = malloc(strlen(home) + 32);
+	sprintf(path, "%s/.config/sshbook/desc",home);
+	
+	char dir[2048];
+	strcpy(dir, path);
+	*strrchr(dir, '/') = 0;
+	mkdir(dir, 0755);
+	
+	char *sub = strrchr(dir, '/');
+	if (sub){ 
+		mkdir(dir, 0755);
+	}
+	return path;
+}
+
 
 void loadMenu(Menu *menu, const char *path) {
 	FILE *f = fopen(path, "a+");
@@ -148,10 +171,10 @@ void deleteItem(Menu *menu, const char *path, int *selected) {
 
 
 int main() {
-	char *config = getHomePath();
+	char *addresses = getHomePath();
 	Menu menu;
 	menuMake(&menu);
-	loadMenu(&menu, config);
+	loadMenu(&menu, addresses);
 	const char *helpMessage =
         "press any key to exit\n"
         "\n"
@@ -204,13 +227,13 @@ int main() {
 			selected = (selected - 1) % menu.count;
 		}
 		else if (c == 'a') {
-				addItem(&menu, config);
+				addItem(&menu, addresses);
 				if (menu.count == 1) {
 						selected = 0;
 		}
 			}
 		else if (c == 'd') {
-				deleteItem(&menu, config, &selected);
+				deleteItem(&menu, addresses, &selected);
 			}
 		else if (c == 'q') {
 			disableRawMode();
@@ -230,6 +253,8 @@ int main() {
 				disableRawMode();
 				char connected[512] = "ssh ";
 				strcat(connected, menu.items[selected]);
+				char *sshAddress =strstr(connected, "/");
+				if (sshAddress) *sshAddress = '\0';
 				system(connected);
 				break;
 

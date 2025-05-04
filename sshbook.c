@@ -152,9 +152,30 @@ int main() {
 	Menu menu;
 	menuMake(&menu);
 	loadMenu(&menu, config);
+	const char *helpMessage =
+        "press any key to exit\n"
+        "\n"
+        "\033[4mUSAGE\033[0m\n"
+        "\t\n"
+        "\tPress the up & down arrow keys or j & k to move up and down the list\n"
+        "\t\n"
+        "\tPress \033[1ma\033[0m to add an entry to the list. Examples:\n"
+        "\t\t192.168.1.29\n"
+        "\t\t2606:4700:abcd:1234:5678:90ab:cdef:1a2b\n"
+        "\t\n"
+        "\tAdd a description to the entry by adding a \"/\", and then your description. Examples:\n"
+        "\t\t192.168.1.29 / homeserver\n"
+        "\t\t2606:4700:abcd:1234:5678:90ab:cdef:1a2b / Personal VPS\n"
+        "\t\n"
+        "\tPress d to delete the selected entry from the list\n"
+        "\t\n"
+        "\tPress \033[1mh\033[0m to print this help message\n"
+        "\t\n"
+        "\tPress \033[1mq\033[0m to quit\n"
+        "\t\n"
+        "\tPress \033[1menter\033[0m to connect\n";
 
 	enableRawMode();
-
 	int selected = 0;
 	char c;
 	while (1) {
@@ -194,6 +215,16 @@ int main() {
 		else if (c == 'q') {
 			disableRawMode();
 			break;
+		} 
+		if (c == 'h') {
+			clearScreen();
+			printf("%s", helpMessage);
+			helpLoop:
+			if (read(STDIN_FILENO, &c, 1) != 1) {
+				usleep(100000);
+				goto helpLoop;
+			} else {
+			}
 		}
 		else if (c == '\n' || c == '\r') {
 				disableRawMode();

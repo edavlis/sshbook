@@ -237,6 +237,8 @@ int main() {
 			}
 		else if (c == 'q') {
 			disableRawMode();
+			free(addresses);
+			free(menu.items);
 			break;
 		} 
 		if (c == 'h') {
@@ -256,6 +258,8 @@ int main() {
 				char *sshAddress =strstr(connected, "/");
 				if (sshAddress) *sshAddress = '\0';
 				system(connected);
+				free(addresses);
+				free(menu.items);
 				break;
 
 			}	

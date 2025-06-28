@@ -8,13 +8,131 @@
 #include <termios.h>
 #include <unistd.h>
 
-#define CAPACITY 32768 // no particular reason for this number. just a high number.
+#define CAPACITY                                                               \
+  16 // no particular reason for this number. just a high number.
 
 struct termios original_termios;
 typedef struct {
   char **items;
   int count, capacity;
 } Menu;
+
+void deleteItem(Menu *menu, const char *path, int *selected);
+void addItem(Menu *menu, const char *path);
+void saveMenu(Menu *menu, const char *path);
+void loadMenu(Menu *menu, const char *path);
+void disableRawMode();
+void enableRawMode();
+void clearScreen();
+void draw_menu(Menu *menu, int selected);
+void menuMake(Menu *menu);
+char *getHomePath();
+
+int main() {
+  char *addresses = getHomePath();
+  Menu menu;
+  menuMake(&menu);
+  loadMenu(&menu, addresses);
+  const char *helpMessage =
+      "press any key to exit\n"
+      "\n"
+      "\033[4mUSAGE\033[0m\n"
+      "\t\n"
+      "\tPress the up & down arrow keys or j & k to move up and down the list\n"
+      "\t\n"
+      "\tPress \033[1ma\033[0m to add an entry to the list. Examples:\n"
+      "\t\t192.168.1.29\n"
+      "\t\t2606:4700:abcd:1234:5678:90ab:cdef:1a2b\n"
+      "\t\n"
+      "\tAdd a description to the entry by adding a \"/\", and then your "
+      "description. Examples:\n"
+      "\t\t192.168.1.29 / homeserver\n"
+      "\t\t2606:4700:abcd:1234:5678:90ab:cdef:1a2b / Personal VPS\n"
+      "\t\n"
+      "\tPress d to delete the selected entry from the list\n"
+      "\t\n"
+      "\tPress \033[1mh\033[0m to print this help message\n"
+      "\t\n"
+      "\tPress \033[1mq\033[0m to quit\n"
+      "\t\n"
+      "\tPress \033[1menter\033[0m to connect\n";
+
+  enableRawMode();
+  int selected = 0;
+  char c;
+  int isRunning = 1;
+  while (isRunning) {
+    draw_menu(&menu, selected);
+
+    if (read(STDIN_FILENO, &c, 1) != 1) {
+      continue;
+    }
+
+    char seq[2];
+    switch (c) {
+    case '\033':
+      read(STDIN_FILENO, &seq[0], 1);
+      read(STDIN_FILENO, &seq[1], 1);
+      if (seq[0] == '[') {
+        if (seq[1] == 'A') {
+          selected = (selected - 1 + menu.count) % menu.count;
+        } else if (seq[1] == 'B') {
+          selected = (selected + 1) % menu.count;
+        }
+      }
+      break;
+    case 'j':
+      if (selected + 1 == menu.count)
+        break;
+      ++selected;
+      break;
+    case 'k':
+      if (selected == 0)
+        break;
+      --selected;
+      break;
+    case 'a':
+      addItem(&menu, addresses);
+      break;
+    case 'd':
+      deleteItem(&menu, addresses, &selected);
+      break;
+    case 'q':
+      disableRawMode();
+      free(addresses);
+      for (int i = 0; i < menu.count; ++i) {
+        free(menu.items[i]);
+      }
+      free(menu.items);
+      isRunning = 0;
+      break;
+    case 'h':
+      clearScreen();
+      printf("%s", helpMessage);
+    helpLoop:
+      if (read(STDIN_FILENO, &c, 1) != 1) {
+        goto helpLoop;
+      }
+    case '\n':
+    case '\r':
+      disableRawMode();
+      char connected[512] = "ssh ";
+      strcat(connected, menu.items[selected]);
+      char *sshAddress = strstr(connected, "/");
+      if (sshAddress)
+        *sshAddress = '\0';
+      system(connected);
+      free(addresses);
+      for (int i = 0; i < menu.count; ++i) {
+        free(menu.items[i]);
+      }
+      free(menu.items);
+      isRunning = 0;
+      break;
+    }
+  }
+  return EXIT_SUCCESS;
+}
 
 void disableRawMode() {
   tcsetattr(STDIN_FILENO, TCSAFLUSH, &original_termios);
@@ -162,95 +280,4 @@ void deleteItem(Menu *menu, const char *path, int *selected) {
     *selected = menu->count - 1;
   }
   saveMenu(menu, path);
-}
-
-int main() {
-  char *addresses = getHomePath();
-  Menu menu;
-  menuMake(&menu);
-  loadMenu(&menu, addresses);
-  const char *helpMessage =
-      "press any key to exit\n"
-      "\n"
-      "\033[4mUSAGE\033[0m\n"
-      "\t\n"
-      "\tPress the up & down arrow keys or j & k to move up and down the list\n"
-      "\t\n"
-      "\tPress \033[1ma\033[0m to add an entry to the list. Examples:\n"
-      "\t\t192.168.1.29\n"
-      "\t\t2606:4700:abcd:1234:5678:90ab:cdef:1a2b\n"
-      "\t\n"
-      "\tAdd a description to the entry by adding a \"/\", and then your "
-      "description. Examples:\n"
-      "\t\t192.168.1.29 / homeserver\n"
-      "\t\t2606:4700:abcd:1234:5678:90ab:cdef:1a2b / Personal VPS\n"
-      "\t\n"
-      "\tPress d to delete the selected entry from the list\n"
-      "\t\n"
-      "\tPress \033[1mh\033[0m to print this help message\n"
-      "\t\n"
-      "\tPress \033[1mq\033[0m to quit\n"
-      "\t\n"
-      "\tPress \033[1menter\033[0m to connect\n";
-
-  enableRawMode();
-  int selected = 0;
-  char c;
-  while (1) {
-    draw_menu(&menu, selected);
-
-    if (read(STDIN_FILENO, &c, 1) != 1) {
-      continue;
-    }
-    if (c == '\033') {
-      char seq[2];
-      read(STDIN_FILENO, &seq[0], 1);
-      read(STDIN_FILENO, &seq[1], 1);
-      if (seq[0] == '[') {
-        if (seq[1] == 'A') {
-          selected = (selected - 1 + menu.count) % menu.count;
-        } else if (seq[1] == 'B') {
-          selected = (selected + 1) % menu.count;
-        }
-      }
-    }
-    if (c == 'j') {
-      selected = (selected + 1 + menu.count) % menu.count;
-    } else if (c == 'k') {
-      selected = (selected - 1) % menu.count;
-    } else if (c == 'a') {
-      addItem(&menu, addresses);
-      if (menu.count == 1) {
-        selected = 0;
-      }
-    } else if (c == 'd') {
-      deleteItem(&menu, addresses, &selected);
-    } else if (c == 'q') {
-      disableRawMode();
-      free(addresses);
-      free(menu.items);
-      break;
-    }
-    if (c == 'h') {
-      clearScreen();
-      printf("%s", helpMessage);
-    helpLoop:
-      if (read(STDIN_FILENO, &c, 1) != 1) {
-        usleep(100000);
-        goto helpLoop;
-      } else {
-      }
-    } else if (c == '\n' || c == '\r') {
-      disableRawMode();
-      char connected[512] = "ssh ";
-      strcat(connected, menu.items[selected]);
-      char *sshAddress = strstr(connected, "/");
-      if (sshAddress)
-        *sshAddress = '\0';
-      system(connected);
-      free(addresses);
-      free(menu.items);
-      break;
-    }
-  }
 }

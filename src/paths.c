@@ -1,7 +1,7 @@
 #include "../include/paths.h"
 
 // expand home path, addresses file, etc.
-char *getHomePath() {
+char *getHomePath(void) {
   const char *home = getenv("HOME");
   if (!home) {
     struct passwd *pw = getpwuid(getuid());

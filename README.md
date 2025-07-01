@@ -2,60 +2,45 @@
 
 Minimal terminal-based SSH launcher for saving ssh entries.
 
-sshbook is a simple TUI tool for managing and launching SSH connections. It stores entries in a plain-text file and lets you add, delete, and connect to hosts from a scrollable list, from a cli.
- Features
+sshbook is a simple TUI tool for managing and launching SSH connections. It stores entries in a plain-text file and lets you add, delete, and connect to hosts from a scrollable CLI.
 
-    Add, remove, and connect to SSH entries
+### Features
+ 1. Manage and connect to SSH entries
+ 2. Scrollable TUI menu with keyboard navigation & vim mode
 
-    Scrollable TUI menu with keyboard navigation & vim mode
+### Installation
 
-    Minimal dependencies
+#### Dependencies
+1. GCC
+2. Unix-like OS
 
-**Installation**
+#### Build & Install
+```
+make
+sudo make install
+```
 
-Requirements
+### Usage
+```
+sshbook
+```
 
-    C compiler (optional)
+#### Controls
+```
+↑ / k: Go upwards
+↓ / j: Go downwards
+[Enter] Select entry
+a: Add entry
+d: delete entry
+q: exit
+h: help
+```
 
-    Unix system (Linux, macOS, etc.)
-
-**Build & Install**
-
-**Option 1:**
-
-    make
-    sudo make install
-
-This installs sshbook to /usr/local/bin/.
-
-**Option 2:**
-    
-    sudo ./install
-
-this copies the sshbook executable to /usr/local/bin/.
+#### Descriptions
+Add a description to your addresses by adding a '/' and then a description.
+```
+126.42.98.92 / My server
+126.42.98.92 / My router
+```
 
 ![usagegif](./usagegif.gif)
-
-
-
-**Usage**
-
-
-Run:
-
-    sshbook
-
-Controls
-
-    ↑ / k: Go upwards
-    ↓ / j: Go downwards
-    [Enter] Select entry
-    a: Add entry
-    d: delete entry
-    q: exit
-    h: help
-
-Add a description to your addresses by adding a '/' and then a description. Example:
-    126.42.98.92 / My server
-    126.42.98.92 / My router
-

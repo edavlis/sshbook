@@ -79,7 +79,7 @@ void deleteItem(Menu *menu, const char *path, int *selected) {
     menu->items[i] = menu->items[i + 1];
   }
   menu->count--;
-  if (*selected >= menu->count) {
+  if (*selected >= menu->count && menu->count > 0) {
     *selected = menu->count - 1;
   }
   saveMenu(menu, path);

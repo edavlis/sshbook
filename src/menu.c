@@ -63,6 +63,10 @@ void addItem(Menu *menu, const char *path) {
   char buffer[512];
   printf("New entry: ");
   if (fgets(buffer, sizeof buffer, stdin)) {
+    if (buffer[0] == '\r' || buffer[0] == '\n') {
+      enableRawMode();
+      return;
+    }
     buffer[strcspn(buffer, "\r\n")] = 0;
     menuAdd(menu, strdup(buffer));
     saveMenu(menu, path);
@@ -79,8 +83,11 @@ void deleteItem(Menu *menu, const char *path, int *selected) {
     menu->items[i] = menu->items[i + 1];
   }
   menu->count--;
-  if (*selected >= menu->count) {
+  if (*selected >= menu->count && menu->count > 0) {
     *selected = menu->count - 1;
+  }
+  if (*selected < 0) {
+    *selected = 0;
   }
   saveMenu(menu, path);
 }

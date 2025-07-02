@@ -4,7 +4,7 @@
 
 struct termios original_termios;
 
-int main() {
+int main(void) {
   char *addresses = getHomePath();
   Menu menu;
   menuMake(&menu);

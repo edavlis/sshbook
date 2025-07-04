@@ -92,6 +92,15 @@ int main(void) {
       break;
     case '\n':
     case '\r':
+      if (menu.count == 0) {
+        clearScreen();
+        printf("No entries have been defined.\n");
+      noEntriesLoop:
+        if (read(STDIN_FILENO, &choice, 1) != 1) {
+          goto noEntriesLoop;
+        }
+        break;
+      }
       disableRawMode();
       char connected[512] = "ssh ";
       strcat(connected, menu.items[selected]);
